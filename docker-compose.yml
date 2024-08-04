@@ -1,0 +1,42 @@
+version: '3'
+services:
+  postgresql:
+    image: 'postgres:alpine'
+    environment:
+      - POSTGRES_USER=rawan
+      - POSTGRES_PASSWORD=mypass
+      - POSTGRES_DB=mydatabase
+    volumes:
+      - type: volume
+        source: postgres-data
+        target: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+ 
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - postgresql
+    environment:
+      - POSTGRES_USER=rawan
+      - POSTGRES_PASSWORD=mypass
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_HOST=postgresql
+      - POSTGRES_PORT=5432
+    ports:
+      - "8080:8080"
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+ 
+volumes:
+  postgres-data:
+ 
+networks:
+  default:
+    name: my-network
